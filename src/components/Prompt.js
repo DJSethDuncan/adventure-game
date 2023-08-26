@@ -7,6 +7,8 @@ function Prompt() {
     hurt: true,
   };
 
+  const defaultbackpack = [];
+
   const locations = {
     forest: {
       id: "forest",
@@ -40,19 +42,28 @@ function Prompt() {
   const [location, setLocation] = useState(locations.forest);
 
   const [playerStatus, setPlayerStatus] = useState(defaultPlayerStatus);
-  const [inventory, setInventory] = useState([]);
+  const [backpack, setBackpack] = useState([]);
 
   const showThings = (objects) => {
     return objects.map((object) => `\n${object.name}`);
   };
 
+  const thingIsGettable = (thing) => {
+    for (const object of location.objects) {
+      if (object.name.toLowerCase() === thing && object.obtainable) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   const processUserInput = (event) => {
     if (event.key === "Enter") {
-      console.log("ENTER");
-
       switch (userInput) {
         case "help":
-          setMessage("look, inventory, get <thing>");
+          setMessage(
+            `You can type the following things:\n"look"\n"backpack"\n"get <thing>"`
+          );
           break;
         case "look":
           if (location.objects.length > 0) {
@@ -64,9 +75,70 @@ function Prompt() {
             );
           }
           break;
-        default:
-          setMessage(`I don't understand what you mean, please try again.`);
+        case "backpack":
+          setMessage(
+            backpack.length > 0
+              ? `You have the following things in your backpack:\n${showThings(
+                  backpack
+                )}`
+              : "There is nothing in your backpack."
+          );
           break;
+        default:
+          // get something
+          const userCommand = userInput.split(" ");
+
+          switch (userCommand[0]) {
+            case "get":
+              const thingToGet = userInput
+                .substring(3, userInput.length)
+                .trim();
+              if (thingIsGettable(thingToGet)) {
+                for (const locationObject of location.objects) {
+                  if (
+                    locationObject.name.toLowerCase() ===
+                    thingToGet.toLowerCase().trim()
+                  ) {
+                    // set location object as obtained
+
+                    // put copy of object in inventory
+                    let backpackContents = backpack;
+                    backpackContents.push(locationObject);
+                    setBackpack(backpackContents);
+                  }
+                }
+                setMessage(`You have picked up the ${thingToGet}`);
+              } else {
+                setMessage(`That's not possible.`);
+              }
+              break;
+            case "drop":
+              const thingToDrop = userInput
+                .substring(4, userInput.length)
+                .trim();
+
+              for (const backpackItem of backpack) {
+                if (
+                  backpackItem.name.toLowerCase() ===
+                  thingToDrop.toLowerCase().trim()
+                ) {
+                  let newBackpack = backpack.filter(
+                    (item) =>
+                      item.name.toLowerCase() !==
+                      thingToDrop.toLowerCase().trim()
+                  );
+                  setBackpack(newBackpack);
+                }
+              }
+              setMessage(`You have dropped the ${thingToDrop}`);
+              break;
+            case "use":
+              setMessage(`Using thing`);
+              break;
+            default:
+              setMessage(`I don't understand what you mean, please try again.`);
+              break;
+          }
       }
 
       setUserInput("");
@@ -77,9 +149,7 @@ function Prompt() {
     setUserInput(event.target.value);
   };
 
-  useEffect(() => {
-    console.log(userInput);
-  });
+  useEffect(() => {});
 
   return (
     <>
