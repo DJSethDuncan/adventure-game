@@ -7,7 +7,7 @@ function Prompt() {
     hurt: true,
   };
 
-  const defaultbackpack = [];
+  const defaultBackpack = [];
 
   const locations = {
     forest: {
@@ -42,7 +42,7 @@ function Prompt() {
   const [location, setLocation] = useState(locations.forest);
 
   const [playerStatus, setPlayerStatus] = useState(defaultPlayerStatus);
-  const [backpack, setBackpack] = useState([]);
+  const [backpack, setBackpack] = useState(defaultBackpack);
 
   const showThings = (objects) => {
     return objects.map((object) => `\n${object.name}`);
