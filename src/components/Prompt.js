@@ -128,6 +128,8 @@ function Prompt() {
                       thingToDrop.toLowerCase().trim()
                   );
                   setBackpack(newBackpack);
+
+                  // put the object in the location objects
                 }
               }
               setMessage(`You have dropped the ${thingToDrop}`);
